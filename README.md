@@ -77,5 +77,15 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
 
 ![Screenshot 2024-03-18 232236](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/37441fee-47da-43b3-8591-0c86eb096624)
+
 Unlock Jenkins using an administrative password and install the suggested plugins.
 
+2B — Install Docker
+
+```bash
+sudo apt-get update
+sudo apt-get install docker.io -y
+sudo usermod -aG docker $USER   #my case is ubuntu
+newgrp docker
+sudo chmod 777 /var/run/docker.sock
+```
