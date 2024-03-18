@@ -93,3 +93,4 @@ After the docker installation, we create a sonarqube container (Remember to add 
 ```bash
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ```
+![Screenshot 2024-03-18 233551](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/e0f4ec44-8e4e-44b0-a22b-6fd7e841ce3b)
