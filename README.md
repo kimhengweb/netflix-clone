@@ -94,3 +94,27 @@ After the docker installation, we create a sonarqube container (Remember to add 
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ```
 ![Screenshot 2024-03-18 233551](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/e0f4ec44-8e4e-44b0-a22b-6fd7e841ce3b)
+
+Enter username and password, click on login and change password
+
+```bash
+username admin
+password admin
+```
+
+2C — Install Trivy
+```bash
+vi trivy.sh
+```
+
+Copy and paste on your vi editor
+
+```bash
+sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+sudo apt-get update
+sudo apt-get install trivy -y
+```
+
+## Step 3: Create a TMDB API Key
