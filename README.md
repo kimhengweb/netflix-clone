@@ -29,15 +29,4 @@ Step 13 — Access the Netflix app on the Browser.
 
 Step 14 — Terminate the AWS EC2 Instances.
 
-Now, let’s get started and dig deeper into each of these steps:-
-
-STEP1:Launch an Ubuntu(22.04) T2 Large Instance
-
-```bash
-docker build -t netflix .
-docker run -d --name netflix -p 8081:80 netflix:latest
-
-#to delete
-docker stop <containerid>
-docker rmi -f netflix
-```
+_Now, let’s get started and dig deeper into each of these steps:_
