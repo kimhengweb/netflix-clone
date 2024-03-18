@@ -118,3 +118,11 @@ sudo apt-get install trivy -y
 ```
 
 ## Step 3: Create a TMDB API Key
+
++ Open a web browser and navigate to TMDB (The Movie Database) website.
++ Click on "Login" and create an account.
++ Once logged in, go to your profile and select "Settings."
++ Click on "API" from the left-side panel.
++ Create a new API key by clicking "Create" and accepting the terms and conditions.
++ Provide the required basic details and click "Submit."
++ You will receive your TMDB API key.
