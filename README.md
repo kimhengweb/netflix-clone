@@ -30,3 +30,5 @@ Step 13 — Access the Netflix app on the Browser.
 Step 14 — Terminate the AWS EC2 Instances.
 
 _Now, let’s get started and dig deeper into each of these steps:_
+
+## STEP1:Launch an Ubuntu(22.04) T2 Large Instance
