@@ -126,3 +126,29 @@ sudo apt-get install trivy -y
 + Create a new API key by clicking "Create" and accepting the terms and conditions.
 + Provide the required basic details and click "Submit."
 + You will receive your TMDB API key.
+
+## Step 4 — Install Prometheus and Grafana On the new Server
+
+First of all, let’s create a dedicated Linux user sometimes called a system account for Prometheus. Having individual users for each service serves two main purposes:
+
+It is a security measure to reduce the impact in case of an incident with the service.
+
+It simplifies administration as it becomes easier to track down what resources belong to which service.
+
+To create a system user or system account, run the following command:
+
+```bash
+sudo useradd \
+    --system \
+    --no-create-home \
+    --shell /bin/false prometheus
+```
+
+You can use the curl or wget command to download Prometheus.
+```bash
+wget https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz
+```
+Then, we need to extract all Prometheus files from the archive.
+```bash
+tar -xvf prometheus-2.47.1.linux-amd64.tar.gz
+```
