@@ -68,3 +68,12 @@ sudo chmod 777 jenkins.sh
 ./jenkins.sh    # this will installl jenkins
 ```
 
+Once Jenkins is installed, you will need to go to your AWS EC2 Security Group and open Inbound Port 8080, since Jenkins works on Port 8080.
+
+Now, grab your Public IP Address
+```bash
+<EC2 Public IP Address:8080>
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+
+![Screenshot 2024-03-18 232236](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/37441fee-47da-43b3-8591-0c86eb096624)
