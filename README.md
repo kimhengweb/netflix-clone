@@ -531,6 +531,57 @@ pipeline{
     }
 }
 
+```
+
 ## Step 9 — Install OWASP Dependency Check Plugins
 
++ GotoDashboard → Manage Jenkins → Plugins → OWASP Dependency-Check. Click on it and install it without restart.
++ Configure the Tool Goto Dashboard → Manage Jenkins → Tools →
+
+Now go configure → Pipeline and add this stage to your pipeline and build.
+```bash
+stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
 ```
+
+## Step 10 — Docker Image Build and Push
+
+We need to install the Docker tool in our system, Goto Dashboard → Manage Plugins → Available plugins → Search for Docker and install these plugins
+
++ Docker
++ Docker Commons
++ Docker Pipeline
++ Docker API
++ docker-build-step
+
+Add this stage to Pipeline Script.
+```bash
+stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                       sh "docker build --build-arg TMDB_V3_API_KEY=Aj7ay86fe14eca3e76869b92 -t netflix ."
+                       sh "docker tag netflix sevenajay/netflix:latest "
+                       sh "docker push sevenajay/netflix:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image sevenajay/netflix:latest > trivyimage.txt"
+            }
+        }
+```
+
+When you log in to your Dockerhub, you will see a new image is created.
+![Screenshot 2024-03-19 080043](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/a97cad01-da37-4e04-adf1-c96a68a6b9cf)
