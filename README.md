@@ -415,3 +415,31 @@ Paste below code
 ```
 ![Screenshot 2024-03-19 071645](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/e5968064-619e-433d-a5b7-2bb1e9726e3f)
 
+Before, restarting check if the config is valid.
+```bash
+promtool check config /etc/prometheus/prometheus.yml
+```
+POST request to reload the config.
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+
+Let’s add Dashboard for a better view in Grafana
+
+Click On __Dashboard__ –> + __symbol__ –> Import Dashboard
+
+Use Id 9964 and click on load
+
++ Select the data source and click on Import to see the Detailed overview of Jenkins
+
+## Step 6 — Email Integration With Jenkins and Plugin Setup
+
++ Install Email Extension Plugin in Jenkins.
++ Go to your Gmail and click on your profile.
++ Then click on Manage Your Google Account –> click on the security tab on the left side panel you will get this page(provide mail password).
++ 2-step verification should be enabled.
++ Search for the app in the search bar you will get app passwords.
++ Click on other and provide your name and click on Generate and copy the password.
++ Once the plugin is installed in Jenkins, click on manage Jenkins –> configure system there under the E-mail Notification section for configuration
++ Click on Manage Jenkins–> credentials and add your mail username and generated password
+
