@@ -217,6 +217,24 @@ ExecStart=/usr/local/bin/prometheus \
 WantedBy=multi-user.target
 ```
 
+To automatically start the Prometheus after reboot, run enable.
+```bash
+sudo systemctl enable prometheus
+```
+Then just start the Prometheus.
+```bash
+sudo systemctl start prometheus
+```
+To check the status of Prometheus run the following command:
+```bash
+sudo systemctl status prometheus
+```
 
+Now we can try to access it via the browser. I’m going to be using the IP address of the Ubuntu server. You need to append port 9090 to the IP
 
+```bash
+<public-ip:9090>
+```
+
+![Screenshot 2024-03-19 001637](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/9a29a6a6-7862-48d6-84ff-1cdd7beac2fe)
 
