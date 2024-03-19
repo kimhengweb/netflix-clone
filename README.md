@@ -238,3 +238,63 @@ Now we can try to access it via the browser. I’m going to be using the IP addr
 
 ![Screenshot 2024-03-19 001637](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/9a29a6a6-7862-48d6-84ff-1cdd7beac2fe)
 
+Install Node Exporter on Ubuntu 22.04
+Next, we’re going to set up and configure Node Exporter to collect Linux system metrics like CPU load and disk I/O. Node Exporter will expose these as Prometheus-style metrics. Since the installation process is very similar, I’m not going to cover as deep as Prometheus.
+
+First, let’s create a system user for Node Exporter by running the following command:
+
+```bash
+sudo useradd \
+    --system \
+    --no-create-home \
+    --shell /bin/false node_exporter
+```
+
+Use the wget command to download the binar
+```bash
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+```
+
+Extract the node exporter from the archive.
+```bash
+tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz
+```
+Move binary to the /usr/local/bin.
+```bash
+sudo mv \
+  node_exporter-1.6.1.linux-amd64/node_exporter \
+  /usr/local/bin/
+```
+
+Clean up, and delete node_exporter archive and a folder.
+```bash
+rm -rf node_exporter*
+```
+Verify that you can run the binary.
+```bash
+node_exporter --version
+```
+
+Next, create a similar systemd unit file.
+```bash
+sudo vim /etc/systemd/system/node_exporter.service
+```
+Insert the node_exporter.service into your vi editor
+```bash
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/node_exporter \
+    --collector.logind
+[Install]
+WantedBy=multi-user.target
+```
