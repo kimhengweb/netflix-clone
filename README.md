@@ -298,3 +298,53 @@ ExecStart=/usr/local/bin/node_exporter \
 [Install]
 WantedBy=multi-user.target
 ```
+To automatically start the Node Exporter after reboot, enable the service.
+```bash
+sudo systemctl enable node_exporter
+```
+Then start the Node Exporter.
+```bash
+sudo systemctl start node_exporter
+```
+
+Check the status of Node Exporter with the following command:
+```bash
+sudo systemctl status node_exporter
+```
+To create a static target, you need to add job_name with static_configs.
+```bash
+sudo vim /etc/prometheus/prometheus.yml
+```
+Insert the below configuration in prometheus.yml 
+```bash
+- job_name: node_export
+    static_configs:
+      - targets: ["localhost:9100"]
+```
+![Screenshot 2024-03-19 064500](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/b8c8000f-2bab-4c5e-aa7c-aec36fd1d43f)
+
+By default, Node Exporter will be exposed on port 9100.
+
+Since we enabled lifecycle management via API calls, we can reload the Prometheus config without restarting the service and causing downtime.
+
+Before, restarting check if the config is valid.
+```bash
+promtool check config /etc/prometheus/prometheus.yml
+```
+
+POST request to reload the config.
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+ Go to __STATUS__ --> __TARGETS__ to Check the targets on prometheus browser
+```bash
+http://<ip>:9090/targets
+```
+Install Grafana on Ubuntu 22.04
+To visualize metrics we can use Grafana. There are many different data sources that Grafana supports, one of them is Prometheus.
+
+First, let’s make sure that all the dependencies are installed.
+```bash
+sudo apt-get install -y apt-transport-https software-properties-common
+```
+
