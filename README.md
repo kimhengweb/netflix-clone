@@ -168,6 +168,55 @@ Move console libraries to the Prometheus configuration directory.
 ```bash
 sudo mv consoles/ console_libraries/ /etc/prometheus/
 ```
+Finally, let’s move the example of the main Prometheus configuration file.
+```bash
+sudo mv prometheus.yml /etc/prometheus/prometheus.yml
+```
+
+To avoid permission issues, you need to set the correct ownership for the /etc/prometheus/ and data directory.
+
+```bash
+sudo chown -R prometheus:prometheus /etc/prometheus/ /data/
+```
+You can delete the archive and a Prometheus folder when you are done.
+```bash
+cd
+rm -rf prometheus-2.47.1.linux-amd64.tar.gz
+```
+
+Verify that you can execute the Prometheus binary by running the following command:
+```bash
+prometheus --version
+```
+We’re going to use Systemd, which is a system and service manager for Linux operating systems. For that, we need to create a Systemd unit configuration file.
+```bash
+sudo vim /etc/systemd/system/prometheus.service
+```
+Insert the Prometheus.service into your vi editor
+```bash
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/data \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.console.libraries=/etc/prometheus/console_libraries \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.enable-lifecycle
+[Install]
+WantedBy=multi-user.target
+```
+
 
 
 
