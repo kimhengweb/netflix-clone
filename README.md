@@ -152,3 +152,22 @@ Then, we need to extract all Prometheus files from the archive.
 ```bash
 tar -xvf prometheus-2.47.1.linux-amd64.tar.gz
 ```
+simply create a /data directory. Also, you need a folder for Prometheus configuration files.
+```bash
+sudo mkdir -p /data /etc/prometheus
+```
+Now, let’s change the directory to Prometheus and move some files.
+```bash
+cd prometheus-2.47.1.linux-amd64/
+```
+let’s move the Prometheus binary and a promtool to the /usr/local/bin/. promtool is used to check configuration files and Prometheus rules.
+```bash
+sudo mv prometheus promtool /usr/local/bin/
+```
+Move console libraries to the Prometheus configuration directory.
+```bash
+sudo mv consoles/ console_libraries/ /etc/prometheus/
+```
+
+
+
