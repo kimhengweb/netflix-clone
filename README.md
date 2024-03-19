@@ -629,3 +629,169 @@ newgrp docker
 sudo chmod 777 /var/run/docker.sock
 ```
 
+```bash
+sudo apt-get update
+```
+
+```bash
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+```
+
+```bash
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+```
+
+```bash
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+```
+
+```bash
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+```
+
+Part 3 ————— Master —————
+```bash
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+# in case your in root exit from it and run below commands
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+```
+
+———-Worker Node————
+```bash
+sudo kubeadm join <master-node-ip>:<master-node-port> --token <token> --discovery-token-ca-cert-hash <hash>
+```
+
+Copy the config file to Jenkins master or the local file manager and save it.
+
+![Screenshot 2024-03-19 082349](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/f6bec923-7b50-4a87-a46e-d9af315ab471)
+
++ Copy it and save it in documents or another folder save it as secret-file.txt
++ Create a secret-file.txt in your file explorer save the config in it and use this at the kubernetes credential section.
++ Install Kubernetes Plugin, Once it’s installed successfully
++ Goto manage Jenkins –> manage credentials –> Click on Jenkins global –> add credentials
+
+### Install Node_exporter on both master and worker
+
+create a system user for Node Exporter by running the following command:
+```bash
+sudo useradd \
+    --system \
+    --no-create-home \
+    --shell /bin/false node_exporter
+```
+
+Use the wget command to download the binary.
+```bash
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+```
+
+Extract the node exporter from the archive.
+```bash
+tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz
+```
+
+Move binary to the /usr/local/bin.
+```bash
+sudo mv \
+  node_exporter-1.6.1.linux-amd64/node_exporter \
+  /usr/local/bin/
+```
+
+Clean up, and delete node_exporter archive and a folder.
+```bash
+rm -rf node_exporter*
+```
+
+Next, create a similar systemd unit file.
+```bash
+sudo vim /etc/systemd/system/node_exporter.service
+```
+
+Insert the node_exporter.service configuration into your vi editor
+```bash
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/node_exporter \
+    --collector.logind
+[Install]
+WantedBy=multi-user.target
+```
+
+To automatically start the Node Exporter after reboot, enable the service.
+```bash
+sudo systemctl enable node_exporter
+```
+
+Then start the Node Exporter.
+```bash
+sudo systemctl start node_exporter
+```
+
+Check the status of Node Exporter with the following command:
+```bash
+sudo systemctl status node_exporter
+```
+
+To create a static target, you need to add job_name with static_configs. Go to Prometheus server.
+```bash
+sudo vim /etc/prometheus/prometheus.yml
+```
+
+Insert the below code into the prometheus.yml.
+```bash
+- job_name: node_export_masterk8s
+    static_configs:
+      - targets: ["<master-ip>:9100"]
+  - job_name: node_export_workerk8s
+    static_configs:
+      - targets: ["<worker-ip>:9100"]
+```
+
+By default, Node Exporter will be exposed on port 9100.
+![Screenshot 2024-03-19 085923](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/2067e2cd-a11f-4d75-85a2-c986843bbeb2)
+
+Before, restarting check if the config is valid.
+```bash
+promtool check config /etc/prometheus/prometheus.yml
+```
+
+POST request to reload the config.
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+
+final step to deploy on the Kubernetes cluster.
+```bash
+stage('Deploy to kubernets'){
+            steps{
+                script{
+                    dir('Kubernetes') {
+                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                                sh 'kubectl apply -f deployment.yml'
+                                sh 'kubectl apply -f service.yml'
+                        }
+                    }
+                }
+            }
+        }
+```
+
+## STEP 12:Access from a Web browser with
+<public-ip-of-slave:service port>
+
+## Step 13: Terminate instances.
