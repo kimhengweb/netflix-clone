@@ -584,4 +584,46 @@ stage("Docker Build & Push"){
 ```
 
 When you log in to your Dockerhub, you will see a new image is created.
+
 ![Screenshot 2024-03-19 080043](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/a97cad01-da37-4e04-adf1-c96a68a6b9cf)
+
+Now Run the container by adding the below stage
+```bash
+stage('Deploy to container'){
+            steps{
+                sh 'docker run -d --name netflix -p 8081:80 sevenajay/netflix:latest'
+            }
+        }
+```
+View your output on your browser wit <Jenkins-public-ip:8081>
+
+## Step 11 — Kuberenetes Setup
+
+### Take-Two Ubuntu 20.04 instances one for k8s master and the other one for worker.
+
+Install Kubectl on Jenkins machine also.
+```bash
+sudo apt update
+sudo apt install curl
+curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client
+
+Part 1 ———-Master Node————
+```bash
+sudo hostnamectl set-hostname K8s-Master
+```
+———-Worker Node————
+```bash
+sudo hostnamectl set-hostname K8s-Worker
+```
+
+Part 2 ————Both Master & Node ————
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+sudo usermod –aG docker Ubuntu
+newgrp docker
+sudo chmod 777 /var/run/docker.sock
+```
+```
