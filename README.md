@@ -443,3 +443,94 @@ Use Id 9964 and click on load
 + Once the plugin is installed in Jenkins, click on manage Jenkins –> configure system there under the E-mail Notification section for configuration
 + Click on Manage Jenkins–> credentials and add your mail username and generated password
 
+## Step 7 — Install Plugins like JDK, Sonarqube Scanner, NodeJs, OWASP Dependency Check
+
+### 7A — Install Plugin
+
+Goto Manage Jenkins →Plugins → Available Plugins →
+
+Install below plugins
+
+1 → Eclipse Temurin Installer (Install without restart)
+
+2 → SonarQube Scanner (Install without restart)
+
+3 → NodeJs Plugin (Install Without restart)
+
+### 7B — Configure Java and Nodejs in Global Tool Configuration
+
+Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(16)→ Click on Apply and Save
+
+### 7C — Create a Job
+
+## Step 8 — Configure Sonar Server in Manage Jenkins
+
+Grab the Public IP Address of your EC2 Instance, Sonarqube works on Port 9000, so <Public IP>:9000. Goto your Sonarqube Server. Click on Administration → Security → Users → Click on Tokens and Update Token → Give it a name → and click on Generate Token
+
++ Goto Jenkins Dashboard → Manage Jenkins → Credentials → Add Secret Text.
++ In the Sonarqube Dashboard add a quality gate also Administration–> Configuration–>Webhooks
+
+Add details
+```bash
+#in url section of quality gate
+<http://jenkins-public-ip:8080>/sonarqube-webhook/
+```
+Let’s go to our jenkins Pipeline and add the script in our Pipeline Script.
+```bash
+pipeline{
+    agent any
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+    stages {
+        stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/Aj7Ay/Netflix-clone.git'
+            }
+        }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
+                    -Dsonar.projectKey=Netflix '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+    }
+    post {
+     always {
+        emailext attachLog: true,
+            subject: "'${currentBuild.result}'",
+            body: "Project: ${env.JOB_NAME}<br/>" +
+                "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                "URL: ${env.BUILD_URL}<br/>",
+            to: 'postbox.aj99@gmail.com',
+            attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        }
+    }
+}
+
+## Step 9 — Install OWASP Dependency Check Plugins
+
+```
