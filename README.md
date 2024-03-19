@@ -347,4 +347,71 @@ First, let’s make sure that all the dependencies are installed.
 ```bash
 sudo apt-get install -y apt-transport-https software-properties-common
 ```
+Next, add the GPG key.
+```bash
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+```
+Add this repository for stable releases.
+```bash
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+```
+After you add the repository, update and install Garafana.
+```bash
+sudo apt-get update
+```
+```bash
+sudo apt-get -y install grafana
+```
+To automatically start the Grafana after reboot, enable the service.
+```bash
+sudo systemctl enable grafana-server
+```
+Then start the Grafana.
+```bash
+sudo systemctl start grafana-server
+```
+To check the status of Grafana, run the following command:
+```bash
+sudo systemctl status grafana-server
+```
+
+Go to http://<ip>:3000 and log in to the Grafana using default credentials. The username is admin, and the password is admin as well.
+```bash
+username admin
+password admin
+```
+
+![Screenshot 2024-03-19 070641](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/f4e21c44-192a-4458-b107-1105f9dd5e82)
+When you log in for the first time, you get the option to change the password
+
++ To visualize metrics, you need to add a data source first.
++ Click Add data source and select Prometheus.
++ For the URL, enter localhost:9090 and click Save and test. You can see Data source is working.
++ Click on Save and Test.
++ Add Dashboard for a better view.
++ Click on Import Dashboard paste this code 1860 and click on load.
++ Select the Datasource and click on Import.
+
+## Step 5 — Install the Prometheus Plugin and Integrate it with the Prometheus server
+
+Let’s Monitor JENKINS SYSTEM
+
+Need Jenkins up and running machine
+
+Goto Manage Jenkins –> Plugins –> Available Plugins
+
+Search for Prometheus and install it
+
+To create a static target, you need to add job_name with static_configs. go to Prometheus server.
+```bash
+sudo vim /etc/prometheus/prometheus.yml
+```
+Paste below code
+```bash
+- job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets: ['<jenkins-ip>:8080']
+```
+![Screenshot 2024-03-19 071645](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/e5968064-619e-433d-a5b7-2bb1e9726e3f)
 
