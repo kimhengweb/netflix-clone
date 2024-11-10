@@ -587,15 +587,7 @@ When you log in to your Dockerhub, you will see a new image is created.
 
 ![Screenshot 2024-03-19 080043](https://github.com/Eric-Kay/netflix-clone-on-kubernetes/assets/126447235/a97cad01-da37-4e04-adf1-c96a68a6b9cf)
 
-Now Run the container by adding the below stage
-```bash
-stage('Deploy to container'){
-            steps{
-                sh 'docker run -d --name netflix -p 8081:80 sevenajay/netflix:latest'
-            }
-        }
-```
-View your output on your browser wit <Jenkins-public-ip:8081>
+
 
 ## Step 11 — Kuberenetes Setup
 
@@ -624,7 +616,7 @@ Part 2 ————Both Master & Node ————
 ```bash
 sudo apt-get update
 sudo apt-get install -y docker.io
-sudo usermod –aG docker Ubuntu
+sudo usermod -aG docker $USER 
 newgrp docker
 sudo chmod 777 /var/run/docker.sock
 ```
@@ -649,6 +641,7 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+sudo snap install kube-apiserver
 ```
 
 Part 3 ————— Master —————
@@ -774,6 +767,16 @@ POST request to reload the config.
 ```bash
 curl -X POST http://localhost:9090/-/reload
 ```
+
+Now Run the container by adding the below stage
+```bash
+stage('Deploy to container'){
+            steps{
+                sh 'docker run -d --name netflix -p 8081:80 sevenajay/netflix:latest'
+            }
+        }
+```
+View your output on your browser wit <Jenkins-public-ip:8081>
 
 final step to deploy on the Kubernetes cluster.
 ```bash
