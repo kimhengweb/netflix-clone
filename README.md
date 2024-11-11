@@ -771,7 +771,7 @@ Now Run the container by adding the below stage
 ```bash
 stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name netflix -p 8081:80 sevenajay/netflix:latest'
+                sh 'docker run -d --name netflix -p 8081:80 erickay/netflix:latest'
             }
         }
 ```
